@@ -1,7 +1,0 @@
-fig:nice-fig
-tab:nice-tab
-prerequisites
-intro
-applications
-example-one
-example-two
