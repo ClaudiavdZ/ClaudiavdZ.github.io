@@ -1,0 +1,65 @@
+C. elegans plate experiment
+
+(Again: work out this exercise in a Rmarkdown file in your portfolio-project. You will need this later to put in your portfolio)
+
+The data for this exercise was kindly supplied by J. Louter (INT/ILC) and was derived from an experiment in which adult C.elegans nematodes were exposed to varying concentrations of different compounds. The variables RawData (the outcome - number of offspring counted as an integer value, after incubation time), compName (the generic name of the compound/chemical), the compConcentration (the concentration of the compound), and the expType are the most important variables in this dataset.
+
+A typical analysis with this data would be to run a dose-response analysis using a log-logistic model with estimates for the maximal, the minimal, the IC50 concentration and the slope at IC50. We will not go into the details but a good package to run such computations and create graphs in R is the {drc} package. See: and:. In the exercise below we will create some visualizations using {ggplot2}.
+
+A. Review the following Excel file in the ./data/CE.LIQ.FLOW.062_Tidydata.xlsx (it’s here), by opening the file in Excel. See if you can spot anything peculiar about this file. Do not edit the file in any way. Just close it when you are done. (Annoyingly, Excel asks you to save your changes, even if you did not touch anything in the file: why is this cumbersome?)
+
+__!!!Datum wordt weergegeven met #### en veel vergeshillende sheet welke on overzichtelijk zijn__ 
+
+B. Open the file in R, using the {readxl} package.
+```{r 1.1B}
+library(tidyverse)
+library(readxl)
+ce_liq_flow_062 <- read_excel("CE.LIQ.FLOW.062_Tidydata.xlsx", sheet = 1)
+#werkt wel in console niet in script
+```
+
+C. Inspect the data types of columns RawData, compName and compConcentration. What types would you expect from the experimental description above. Have the data types been correctly assigned during the importing of the data into R?
+```{r 1.1C}
+typeof(ce_liq_flow_062$RawData)
+typeof(ce_liq_flow_062$compName)
+typeof(ce_liq_flow_062$compConcentration)
+```
+compConcentration should be numeric
+
+D. Create a graph displaying a scatterplot for the CE.LIQ.FLOW.062_Tidydata.xlsx data, for the different compounds and the varying concentrations. Put the compConcentration on the x-axis, the DataRaw counts on the y-axis and assign a colour to each level in compName. Assign a different symbol (shape =) to each level in the expType variable. Try fixing the labels of the x-axis so that we can read them.
+```{r 1.1D}
+ggplot(data = ce_liq_flow_062, aes(x = compConcentration, y = RawData)) +
+  geom_point(aes(colour = compName, shape = compName)) +
+   scale_x_discrete(guide = guide_axis(angle = 45)) +
+  labs(title = "compConcentration is double")
+```
+https://www.datanovia.com/en/blog/ggplot-point-shapes-best-tips/
+https://stackoverflow.com/questions/1330989/rotating-and-spacing-axis-labels-in-ggplot2
+
+E. When creating the plot under C), what happened with the ordering of the x-axis labels. Explain why this happens. Look at the data-type of the compConcentration column in the data again to find a clue.
+ze worden niet afgerond? omdat het characters zijn?
+
+F. Correct the data-type of compConcentration to numeric and than look at the graph again. Use a log10 transformation on the x-axis to get a clear graph. Also, add a bit of jitter to the points in the graph so that points are not overlapping.
+```{r 1.1F}
+ce_liq_flow_062$compConcentration <- as.numeric(as.character(ce_liq_flow_062$compConcentration))
+typeof(ce_liq_flow_062$compConcentration)
+
+log10_scatter <-ggplot(data = ce_liq_flow_062, aes(x = compConcentration, y = RawData)) +
+  geom_point(position=position_jitter(width=.1,height=0),aes(colour = compName, shape = compName)) +
+   scale_x_discrete(guide = guide_axis(angle = 45))+
+   labs(title = "compConcentration is numeric") 
+
+
+log10_scatter + scale_x_log10()
+```
+
+G.Fill in: (G) The positive control for this experiments is __naphthale__ (H) The negative control for this experiment is __S-medium__.
+
+I.Think about how you would analyze this experiment to learn whether there is indeed an effect of different concentrations on offspring count and whether the different compounds have a different curve (IC50). Write down you analysis as a step-wise plan
+
+1. kijk of de data normaal verdeeld is
+2. voer de bijbehorende statistische toets uit
+
+J.Normalize the data for the controlNegative in such a way that the mean value for controlNegative is exactly equal to 1 and that all other values are expressed as a fraction thereof. Rerun your graphs with the normalized data.
+
+H.Why would you want to take the step under J?
